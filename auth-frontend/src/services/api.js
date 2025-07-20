@@ -4,6 +4,9 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
 });
 
+// Debug: Log the base URL being used
+console.log('API Base URL:', import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
+
 // Add token to requests automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
