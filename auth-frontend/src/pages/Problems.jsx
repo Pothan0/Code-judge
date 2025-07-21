@@ -20,10 +20,13 @@ const Problems = () => {
 
   const fetchProblems = async () => {
     try {
+      console.log('📋 Fetching problems with filters:', filters);
       setLoading(true);
       const response = await problemAPI.getProblems(filters);
+      console.log('✅ Problems fetched successfully:', response.data.problems?.length || 0, 'problems');
       setProblems(response.data.problems);
     } catch (error) {
+      console.error('❌ Failed to fetch problems:', error);
       toast.error('Failed to fetch problems');
       console.error('Error fetching problems:', error);
     } finally {
@@ -33,9 +36,12 @@ const Problems = () => {
 
   const fetchStats = async () => {
     try {
+      console.log('📊 Fetching problem stats...');
       const response = await problemAPI.getProblemStats();
+      console.log('✅ Stats fetched successfully:', response.data);
       setStats(response.data);
     } catch (error) {
+      console.error('❌ Failed to fetch stats:', error);
       console.error('Error fetching stats:', error);
     }
   };

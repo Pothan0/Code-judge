@@ -7,19 +7,74 @@ const api = axios.create({
 // Debug: Log the base URL being used
 console.log('API Base URL:', import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
 
+// Debug: Add a test function to window for manual testing
+if (typeof window !== 'undefined') {
+  window.testAPI = async () => {
+    console.log('🧪 Testing API Connection...');
+    try {
+      const response = await api.get('/problems');
+      console.log('✅ API Test Successful!', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ API Test Failed!', error);
+      throw error;
+    }
+  };
+  
+  window.testHealth = async () => {
+    console.log('🏥 Testing Health Endpoint...');
+    try {
+      const response = await api.get('/health');
+      console.log('✅ Health Check Successful!', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Health Check Failed!', error);
+      throw error;
+    }
+  };
+  
+  console.log('🔧 Debug functions available:');
+  console.log('  - window.testAPI() - Test problems endpoint');
+  console.log('  - window.testHealth() - Test health endpoint');
+}
+
 // Add token to requests automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  // Debug: Log outgoing requests
+  console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
+  if (config.data) {
+    console.log(`📤 Request Data:`, config.data);
+  }
+  
   return config;
 });
 
 // Handle unauthorized responses
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Debug: Log successful responses
+    console.log(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url} - Status: ${response.status}`);
+    if (response.data) {
+      console.log(`📥 Response Data:`, response.data);
+    }
+    return response;
+  },
   (error) => {
+    // Debug: Log error responses
+    console.error(`❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`);
+    console.error(`Status: ${error.response?.status} - ${error.response?.statusText}`);
+    if (error.response?.data) {
+      console.error(`Error Data:`, error.response.data);
+    }
+    if (error.message) {
+      console.error(`Error Message:`, error.message);
+    }
+    
     if (error.response?.status === 401) {
       // Clear both token and user data on 401
       localStorage.removeItem('token');
